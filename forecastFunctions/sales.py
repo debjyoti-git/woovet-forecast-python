@@ -161,7 +161,7 @@ def handle_sales_services_forecast(event, collection):
             yhat_sum = forecast["yhat"].sum()
 
             sales_services_forecast.append(
-                {"service": item["service"], "count": max(0, round(yhat_sum, 2))})
+                {"service": item["service"], "amount": max(0, round(yhat_sum, 2))})
 
         return {
             "statusCode": 200,
