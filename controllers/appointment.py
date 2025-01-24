@@ -252,3 +252,87 @@ def handle_appointment_doctor_forecast(request):
 
     except Exception as e:
         return e
+
+
+def handle_appointment_type_forecast(request):
+    try:
+        _db = get_db_instance()
+        duration = request.args.get("duration")
+        if duration is None:
+            raise Exception("Required fields are missing !!!")
+
+        duration = int(duration)
+        collection = _db["forecast_app_types"]
+        items = list(
+            collection.aggregate(
+                [
+                    {
+                        "$group": {
+                            "_id": "$appType",
+                            "data": {"$push": {"date": "$date", "count": "$count"}},
+                        }
+                    },
+                    {
+                        "$lookup": {
+                            "from": "app_types",
+                            "localField": "_id",
+                            "foreignField": "_id",
+                            "as": "appType",
+                        }
+                    },
+                    {
+                        "$project": {
+                            "appType": {"$arrayElemAt": ["$appType.name", 0]},
+                            "data": 1,
+                        }
+                    },
+                    {"$sort": {"_id": 1}},
+                ]
+            )
+        )
+
+        # Get the current date
+        current_date = pd.Timestamp.now()
+
+        # Calculate the start of the current month
+        start_date = current_date.replace(day=1)
+
+        # Calculate the end of the next three months
+        end_date = (start_date + pd.DateOffset(months=duration)) - pd.DateOffset(days=1)
+
+        # Create a date range from the start of the current month to the end of the next three months
+        future_dates = pd.date_range(start=start_date, end=end_date, freq="D")
+
+        # Create a DataFrame for the future dates
+        future = pd.DataFrame(future_dates, columns=["ds"])
+
+        app_type_forecast = []
+
+        for item in items:
+            # Convert list of dictionaries to DataFrame
+            df = pd.DataFrame(item["data"])
+            # Rename the columns
+            df.columns = ["ds", "y"]
+
+            # Convert 'ds' column to datetime format
+            df["ds"] = pd.to_datetime(df["ds"], format="%m/%d/%Y")
+
+            # Train your Prophet model
+            model = Prophet()
+            model.fit(df)
+
+            # Make predictions
+            forecast = model.predict(future)
+
+            yhat_sum = forecast["yhat"].sum()
+
+            app_type_forecast.append(
+                {"appType": item["appType"], "count": max(0, int(round(yhat_sum)))}
+            )
+
+        return {
+            "body": json.dumps(app_type_forecast),
+        }
+
+    except Exception as e:
+        return e

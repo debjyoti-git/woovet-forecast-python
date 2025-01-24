@@ -40,6 +40,16 @@ def forecast_app_doctors():
     return appointment.handle_appointment_doctor_forecast(request)
 
 
+@app_routes.route("/api/v1/forecast-app-types")
+def forecast_app_types():
+    return appointment.handle_appointment_type_forecast(request)
+
+
+@app_routes.route("/api/v1/forecast-sales-services")
+def forecast_sales_service():
+    return sales.handle_sales_services_forecast(request)
+
+
 # return "hello"
 
 
