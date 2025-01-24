@@ -2,7 +2,7 @@ from pymongo import MongoClient
 import os
 
 
-_db = None 
+_db = None
 
 
 def connect_to_mongo():
@@ -10,9 +10,12 @@ def connect_to_mongo():
     if _db is None:
         mongo_uri = os.getenv("MONGO_URI")
         client = MongoClient(mongo_uri)
-        _db = client['forecast']        
-        print(f"_db:", _db)
+        _db = client["forecast"]
+        print(
+            f"_db: {_db}",
+        )
     return _db
+
 
 def get_db_instance():
     """Return the database instance, ensuring it's initialized."""
