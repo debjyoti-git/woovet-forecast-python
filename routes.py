@@ -1,5 +1,5 @@
 from flask import request, Blueprint
-from controllers import client, patient
+from controllers import client, patient, sales, appointment, referrals
 
 app_routes = Blueprint("app_routes", __name__)
 
@@ -13,6 +13,31 @@ def forecast_clients():
 @app_routes.route("/api/v1/forecast-patients")
 def forecast_patients():
     return patient.handle_patient_forecast(request)
+
+
+@app_routes.route("/api/v1/forecast-sales")
+def forecast_sales():
+    return sales.handle_sales_forecast(request)
+
+
+@app_routes.route("/api/v1/forecast-appointments")
+def forecast_appointment():
+    return appointment.handle_appointment_forecast(request)
+
+
+@app_routes.route("/api/v1/forecast-referrals")
+def forecast_referrals():
+    return referrals.handle_referral_forecast(request)
+
+
+@app_routes.route("/api/v1/forecast-noshows")
+def forecast_noshows():
+    return appointment.handle_noshows_forecast(request)
+
+
+@app_routes.route("/api/v1/forecast-app-doctors")
+def forecast_app_doctors():
+    return appointment.handle_appointment_doctor_forecast(request)
 
 
 # return "hello"

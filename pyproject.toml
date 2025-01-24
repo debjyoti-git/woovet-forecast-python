@@ -1,0 +1,25 @@
+[project]
+name = "woovet-forecast"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "Debjyoti Bose", email = "leom70219@gmail.com"},
+]
+dependencies = ["pandas>=2.2.3", "prophet>=1.1.6", "pymongo>=4.10.1", "flask>=3.1.0"]
+requires-python = "==3.12.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+
+[tool.pdm]
+distribution = false
+
+[tool.pdm.scripts]
+dev = "python main.py"
+[dependency-groups]
+dev = [
+    "pdm>=2.22.2",
+    "plotly>=5.24.1",
+]
+
